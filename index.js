@@ -6,7 +6,7 @@ const PORT = 3000;
 // Middleware
 app.use(express.json());
 
-// Simple API
+// Simple API to test CI/CD
 app.get('/', (req, res) => {
 res.send('CI/CD Pipeline is working 🚀');
 });
@@ -24,6 +24,7 @@ res.json([
 ]);
 });
 
+
 // POST API
 app.post('/api/data', (req, res) => {
 const data = req.body;
@@ -33,6 +34,7 @@ data
 });
 });
 
+// Start the server
 app.listen(PORT, '0.0.0.0', () => {
 console.log(`Server running on port ${PORT}`);
 });
