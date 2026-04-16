@@ -13,7 +13,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/kishore18trs-alt/jenkins-cicd-pipeline.git'
+                git branch: 'main', url: 'https://github.com/kishore18trs-alt/Jenkins-Pipeline.git'
             }
         }
 
@@ -30,27 +30,19 @@ pipeline {
         }
 
         stage('Deploy') {
-    steps {
-        sh '''
-            npm install -g pm2
+            steps {
+                sh '''
+                     docker stop my-node-app || true
+                     docker rm my-node-app || true
 
-            pm2 stop node-app || true
-            pm2 delete node-app || true
+                     docker stop my-node-app || true
+                     docker rm my-node-app || true
 
-            pm2 start index.js --name node-app
-
-            sleep 5
-
-            pm2 logs node-app --lines 20
-
-            for i in {1..5}; do
-              curl -f http://localhost:3000 && break
-              echo "Retrying..."
-              sleep 3
-            done
-        '''
-    }
-}
+                    sleep 5
+                    curl -f http://localhost:3000/health
+                '''
+            }
+        }
 
         stage('Notify') {
             steps {
