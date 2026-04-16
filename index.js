@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 const PORT = 3000;
 
-// Middleware
+// Middleware for express to parse JSON bodies
 app.use(express.json());
 
 // Simple API to test CI/CD
