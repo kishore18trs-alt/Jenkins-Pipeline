@@ -9,6 +9,17 @@ pipeline {
         nodejs 'NodeJS-20'
     }
 
+    // ── PARAMETERS: inputs you choose on "Build with Parameters" ──
+    parameters {
+        choice(name: 'DEPLOY_ENV', choices: ['dev', 'staging', 'prod'], description: 'Which environment to deploy to')
+        booleanParam(name: 'RUN_TESTS', defaultValue: true, description: 'Run the Test stage?')
+    }
+
+    // ── CREDENTIALS: pull the secret by ID and inject it MASKED as $API_KEY ──
+    environment {
+        API_KEY = credentials('demo-api-key')
+    }
+
     stages {
 
         stage('Checkout') {
@@ -23,15 +34,41 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            steps {
-                sh 'npm test'
+        // ── PARALLEL: Lint and Test run at the SAME time ──
+        stage('Quality Checks') {
+            parallel {
+                stage('Lint') {
+                    steps {
+                        sh 'echo "Linting code... (placeholder — no linter configured yet)"'
+                    }
+                }
+                stage('Test') {
+                    // ── WHEN: only run tests if the RUN_TESTS checkbox is ticked ──
+                    when {
+                        expression { return params.RUN_TESTS }
+                    }
+                    steps {
+                        sh 'npm test'
+                    }
+                }
             }
         }
 
+        stage('Use Secret') {
+            steps {
+                // $API_KEY comes from the credentials store — Jenkins masks it as **** in the log
+                sh 'echo "Deploying with API key: $API_KEY (see how it is masked?)"'
+            }
+        }
+
+        // ── WHEN: only deploy for staging/prod — skip on dev ──
         stage('Deploy') {
+            when {
+                expression { return params.DEPLOY_ENV != 'dev' }
+            }
             steps {
                 sh '''
+                    echo "Deploying to environment: $DEPLOY_ENV"
                     echo "Stopping old container..."
                     docker stop my-node-app || true
                     docker rm my-node-app || true
@@ -53,25 +90,17 @@ pipeline {
 
         stage('Notify') {
             steps {
-                echo "Pipeline completed successfully 🎉"
+                echo "Pipeline completed for '${params.DEPLOY_ENV}' 🎉"
             }
         }
     }
 
     post {
-        // Email disabled until SMTP is configured in Manage Jenkins → System.
-        // Using echo for now so the build stays green.
         success {
             echo "SUCCESS: ${env.JOB_NAME} — build passed ✅ ${env.BUILD_URL}"
-            // mail to: 'kishore18.trs@gmail.com',
-            //      subject: "SUCCESS: ${env.JOB_NAME}",
-            //      body: "Build passed ✅ ${env.BUILD_URL}"
         }
         failure {
             echo "FAILED: ${env.JOB_NAME} — build failed ❌ ${env.BUILD_URL}"
-            // mail to: 'kishore18.trs@gmail.com',
-            //      subject: "FAILED: ${env.JOB_NAME}",
-            //      body: "Build failed ❌ ${env.BUILD_URL}"
         }
     }
 }
