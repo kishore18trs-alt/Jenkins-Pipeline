@@ -39,7 +39,7 @@ pipeline {
             parallel {
                 stage('Lint') {
                     steps {
-                        sh 'echo "Linting code... (placeholder — no linter configured yet)"'
+                        sh 'npm run lint'
                     }
                 }
                 stage('Test') {
