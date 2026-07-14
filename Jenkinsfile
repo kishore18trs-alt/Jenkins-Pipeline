@@ -29,6 +29,13 @@ pipeline {
             }
         }
 
+        // ── Deploy stage temporarily disabled ──
+        // Needs the docker CLI + docker socket inside the Jenkins container.
+        // Re-enable once Jenkins is rebuilt with docker support.
+        // NOTE: when re-enabling, change the health check to:
+        //   curl -f http://host.docker.internal:3000/health
+        // because localhost inside the Jenkins container is NOT the host.
+        /*
         stage('Deploy') {
     steps {
         sh '''
@@ -46,10 +53,11 @@ pipeline {
             sleep 5
 
             echo "Health check..."
-            curl -f http://localhost:3000/health
+            curl -f http://host.docker.internal:3000/health
         '''
     }
 }
+        */
 
         stage('Notify') {
             steps {
@@ -59,15 +67,19 @@ pipeline {
     }
 
     post {
+        // Email disabled until SMTP is configured in Manage Jenkins → System.
+        // Using echo for now so the build stays green.
         success {
-            mail to: 'kishore18.trs@gmail.com',
-                 subject: "SUCCESS: ${env.JOB_NAME}",
-                 body: "Build passed ✅ ${env.BUILD_URL}"
+            echo "SUCCESS: ${env.JOB_NAME} — build passed ✅ ${env.BUILD_URL}"
+            // mail to: 'kishore18.trs@gmail.com',
+            //      subject: "SUCCESS: ${env.JOB_NAME}",
+            //      body: "Build passed ✅ ${env.BUILD_URL}"
         }
         failure {
-            mail to: 'kishore18.trs@gmail.com',
-                 subject: "FAILED: ${env.JOB_NAME}",
-                 body: "Build failed ❌ ${env.BUILD_URL}"
+            echo "FAILED: ${env.JOB_NAME} — build failed ❌ ${env.BUILD_URL}"
+            // mail to: 'kishore18.trs@gmail.com',
+            //      subject: "FAILED: ${env.JOB_NAME}",
+            //      body: "Build failed ❌ ${env.BUILD_URL}"
         }
     }
 }
