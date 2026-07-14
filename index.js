@@ -19,7 +19,7 @@ res.status(200).json({ status: 'OK' });
 // Sample API
 app.get('/api/users', (req, res) => {
 res.json([
-{ id: 1, name: 'Kishore' },
+{ id: 1, name: 'Kishore G' },
 
 ]);
 });
