@@ -24,7 +24,10 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/kishore18trs-alt/Jenkins-Pipeline.git'
+                // `checkout scm` = check out whatever branch/commit triggered THIS build.
+                // Works for both the single-branch job (builds main) and the
+                // multibranch pipeline (builds feature branches / PRs correctly).
+                checkout scm
             }
         }
 
