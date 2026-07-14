@@ -9,7 +9,7 @@ app.use(express.json());
 // Simple API to test CI/CD
 app.get('/', (req, res) => {
   res.send('CI/CD Pipeline is working 🚀');
-  res.send(message)
+
 });
 
 // Health Check API (IMPORTANT for DevOps)
