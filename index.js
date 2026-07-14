@@ -20,7 +20,7 @@ res.status(200).json({ status: 'OK' });
 app.get('/api/users', (req, res) => {
 res.json([
 { id: 1, name: 'Kishore' },
-{ id: 2, name: 'DevOps User' }
+
 ]);
 });
 
