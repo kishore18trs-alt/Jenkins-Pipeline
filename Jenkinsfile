@@ -53,6 +53,15 @@ pipeline {
                     steps {
                         sh 'npm test'
                     }
+                    // ── REPORTS: publish test results + coverage to Jenkins ──
+                    post {
+                        always {
+                            // JUnit plugin: shows pass/fail counts + a trend graph over builds
+                            junit testResults: 'junit.xml', allowEmptyResults: true
+                            // Coverage plugin: shows % of code exercised by tests
+                            recordCoverage(tools: [[parser: 'COBERTURA', pattern: 'coverage/cobertura-coverage.xml']])
+                        }
+                    }
                 }
             }
         }
