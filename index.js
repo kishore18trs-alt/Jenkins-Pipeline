@@ -8,9 +8,10 @@ app.use(express.json());
 
 // Simple API to test CI/CD
 app.get('/', (req, res) => {
-  res.send(brokenVariable);   // ❌ 'brokenVariable' is not defined — ESLint will catch this
-});
+res.send('CI/CD Pipeline is working 🚀 — v2 from feature-2!');
 
+
+});
 
 // Health Check API (IMPORTANT for DevOps)
 app.get('/health', (req, res) => {
