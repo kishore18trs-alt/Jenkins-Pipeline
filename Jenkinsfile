@@ -110,9 +110,23 @@ pipeline {
     post {
         success {
             echo "SUCCESS: ${env.JOB_NAME} — build passed ✅ ${env.BUILD_URL}"
+            mail to: 'kishore18.trs@gmail.com',
+                 subject: "✅ SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                 body: """Good news — the build passed! 🎉
+
+Job:   ${env.JOB_NAME}
+Build: #${env.BUILD_NUMBER}
+Link:  ${env.BUILD_URL}"""
         }
         failure {
             echo "FAILED: ${env.JOB_NAME} — build failed ❌ ${env.BUILD_URL}"
+            mail to: 'kishore18.trs@gmail.com',
+                 subject: "❌ FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                 body: """The build failed. 😟
+
+Job:   ${env.JOB_NAME}
+Build: #${env.BUILD_NUMBER}
+Check the logs: ${env.BUILD_URL}"""
         }
     }
 }
