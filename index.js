@@ -8,7 +8,7 @@ app.use(express.json());
 
 // Simple API to test CI/CD
 app.get('/', (req, res) => {
-res.send('CI/CD Pipeline is working 🚀 — v2 from feature-2!');
+res.send('CI/CD Pipeline is working 🚀');
 
 
 });
