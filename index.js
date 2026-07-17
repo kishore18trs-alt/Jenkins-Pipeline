@@ -8,8 +8,8 @@ app.use(express.json());
 
 // Simple API to test CI/CD
 app.get('/', (req, res) => {
-res.send('CI/CD Pipeline Jenkins & Coolify Deployment  is working 🚀 — tunnel test!');
-// res.send('Push-to-deploy WORKS 🚀 Coolify auto-deployed this!');
+res.send('CI/CD Pipeline is working 🚀 — Jenkins & Coolify Deployment!');
+
 
 });
 
