@@ -110,6 +110,20 @@ pipeline {
     post {
         success {
             echo "SUCCESS: ${env.JOB_NAME} — build passed ✅ ${env.BUILD_URL}"
+
+            // ── THE GATE (CI → CD) ──
+            // This block runs ONLY if every stage above passed (incl. Test).
+            // So if a test fails, the build never reaches here → Coolify is NEVER triggered.
+            // That is what makes tests *gate* the deploy.
+            withCredentials([string(credentialsId: 'coolify-token', variable: 'COOLIFY_TOKEN')]) {
+                sh '''
+                    echo "All checks passed — asking Coolify to deploy... 🚀"
+                    curl --fail -X GET \
+                      "http://host.docker.internal:8000/api/v1/deploy?uuid=rd2tzzddrlzcq1ndgpdo4vgl&force=false" \
+                      -H "Authorization: Bearer $COOLIFY_TOKEN"
+                '''
+            }
+
             mail to: 'kishore18.trs@gmail.com',
                  subject: "✅ SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                  body: """Good news — the build passed! 🎉
