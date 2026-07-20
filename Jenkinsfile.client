@@ -1,0 +1,53 @@
+// Multi-client pipeline — ONE file serves every client.
+// The job supplies CLIENT_SLUG + DEPLOY_ENV; credential IDs are derived from them.
+pipeline {
+  agent any
+
+  tools { nodejs 'NodeJS-20' }
+
+  environment {
+    DEPLOY_URL_ID   = "${CLIENT_SLUG}-${DEPLOY_ENV}-deploy-url"
+    DEPLOY_TOKEN_ID = "${CLIENT_SLUG}-${DEPLOY_ENV}-deploy-token"
+  }
+
+  stages {
+    stage('Info') {
+      steps {
+        echo "Client : ${CLIENT_SLUG}"
+        echo "Env    : ${DEPLOY_ENV}"
+        echo "Reading credentials: ${env.DEPLOY_URL_ID} + ${env.DEPLOY_TOKEN_ID}"
+      }
+    }
+
+    stage('Test') {
+      steps {
+        sh 'npm ci'
+        sh 'npm test'
+      }
+      post {
+        always { junit 'junit.xml' }
+      }
+    }
+
+    stage('Deploy') {
+      steps {
+        withCredentials([
+          string(credentialsId: env.DEPLOY_URL_ID,   variable: 'DEPLOY_URL'),
+          string(credentialsId: env.DEPLOY_TOKEN_ID, variable: 'DEPLOY_TOKEN')
+        ]) {
+          sh '''
+            echo "Deploying ${CLIENT_SLUG} to ${DEPLOY_ENV}..."
+            curl --fail --silent --show-error --max-time 15 \
+                 -H "Authorization: Bearer $DEPLOY_TOKEN" \
+                 "$DEPLOY_URL"
+          '''
+        }
+      }
+    }
+  }
+
+  post {
+    success { echo "${CLIENT_SLUG}/${DEPLOY_ENV} deployed OK" }
+    failure { echo "${CLIENT_SLUG}/${DEPLOY_ENV} FAILED" }
+  }
+}
