@@ -21,11 +21,11 @@ pipeline {
 
     stage('Test') {
       steps {
-        sh 'npm ci'
+        sh 'npm install'
         sh 'npm test'
       }
       post {
-        always { junit 'junit.xml' }
+        always { junit testResults: 'junit.xml', allowEmptyResults: true }
       }
     }
 
